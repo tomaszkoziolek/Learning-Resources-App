@@ -1,27 +1,75 @@
 <template>
+  <base-dialog
+    v-if="inputIsInvalid"
+    title="Invalid Input"
+    @close="confirmError"
+  >
+    <template #default>
+      <p>Unfortunately, at least one input value is invalid.</p>
+      <p>Please check all inputs.</p>
+    </template>
+    <template #actions>
+      <base-button @click="confirmError">Okay</base-button>
+    </template>
+  </base-dialog>
   <base-card>
     <form>
       <div class="form-controll">
         <label for="title">Title</label>
-        <input id="title" name="title" type="text" />
+        <input id="title" name="title" type="text" ref="titleInput" />
       </div>
       <div class="form-controll">
         <label for="description">Description</label>
-        <textarea name="description" id="description" rows="3"></textarea>
+        <textarea
+          name="description"
+          id="description"
+          rows="3"
+          ref="descInput"
+        ></textarea>
       </div>
       <div class="form-controll">
         <label for="link">Title</label>
-        <input id="link" name="link" type="url" />
+        <input id="link" name="link" type="url" ref="linkInput" />
       </div>
       <div>
-        <base-button type="submit">Add Resource</base-button>
+        <base-button type="submit" @click.prevent="setData"
+          >Add Resource</base-button
+        >
       </div>
     </form>
   </base-card>
 </template>
 
 <script>
-export default {};
+export default {
+  inject: ["addResource"],
+  data() {
+    return {
+      inputIsInvalid: false,
+    };
+  },
+  methods: {
+    setData() {
+      const enteredTitle = this.$refs.titleInput.value;
+      const enteredDescription = this.$refs.descInput.value;
+      const enteredLink = this.$refs.linkInput.value;
+
+      if (
+        enteredTitle.trim() === "" ||
+        enteredDescription.trim() === "" ||
+        enteredLink.trim() === ""
+      ) {
+        this.inputIsInvalid = true;
+        return;
+      }
+
+      this.addResource(enteredTitle, enteredDescription, enteredLink);
+    },
+    confirmError() {
+      this.inputIsInvalid = false;
+    },
+  },
+};
 </script>
 
 <style scoped>
